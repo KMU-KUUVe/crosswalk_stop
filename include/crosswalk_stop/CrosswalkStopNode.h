@@ -67,6 +67,7 @@ class CrosswalkStopNode
 		 *
 		 */
 		int laneDetecting();
+		bool parkingstart();
 
 
 	protected:
@@ -74,14 +75,9 @@ class CrosswalkStopNode
 		ros::Publisher control_pub_;	// Controll 메시지를 Publish하는 Publisher
 		ros::Subscriber image_sub_;		// 가공되지 않은 raw image 메시지를 Subscribe하는 Subscriber
 
-		int throttle_ = 0;
-		int steer_control_value_= 0;
-
-		double angle_factor_ = 1.0;
-
-
 		LaneDetector lanedetector;  // Create the class object
 		Parking parking;
+
 		cv::Mat frame;
 		cv::Mat img_denoise;
 		cv::Mat img_edges;
@@ -101,7 +97,7 @@ class CrosswalkStopNode
 		int j = 0;
 		double angle = 0;
 		bool parking_stop = false;
-  	int throttle_ = 0;
+  	int throttle_ = 5;
   	int steer_control_value_= 0;
   	double angle_factor_ = 1.0;
 		cv::String test_video_path = "";

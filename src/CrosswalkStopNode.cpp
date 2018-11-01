@@ -32,10 +32,19 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		cerr << e.what() << endl;
 	}
 
-	getRosParamForUpdate();
-
-	steer_control_value_ = laneDetecting();
-
+	//getRosParamForUpdate();
+	//cout << "crosswalk_stop_node" << endl;
+	bool x = parkingstart();
+	cout << "x : " << x << endl;
+	if(!parkingstart()){
+			cout << "do lane detecting" << endl;
+			steer_control_value_ = laneDetecting();
+	}
+	else{
+		cout << "parking" << endl;
+		steer_control_value_ = 0;
+	}
+	cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 
 	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
@@ -77,6 +86,8 @@ int CrosswalkStopNode::laneDetecting()
 
 
 	lanedetector.filter_colors(img_denoise, img_mask2);
+	//indoor test
+	bitwise_not(img_mask2,img_mask2); // test for black white invert
 
 	// Ȯ�� ����
 	//Mat mask = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1));
@@ -148,6 +159,45 @@ int CrosswalkStopNode::laneDetecting()
 	return angle * angle_factor_;
 }
 
+bool CrosswalkStopNode::parkingstart()
+{
+	int throttle;
+	int ncols = frame.cols;
+	int nrows = frame.rows;
+
+	int64 t1 = getTickCount();
+	frame_count++;
+
+	resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
+	img_denoise = parking.deNoise(frame);
+	parking.filter_colors(img_denoise, img_mask2);
+	//indoor test
+	bitwise_not(img_mask2,img_mask2); // test for black white invert
+	img_mask = parking.mask(img_mask2);
+	imshow("original", frame);
+	imshow("color_filter", img_mask2);
+	imshow("img_filter", img_mask);
+
+	cout << "parking start" << endl;
+	if(parking.detectstoppoint(img_mask, frame, 1, 3)){
+		throttle_ = 0;
+		if(!parking_stop){
+				parking_stop = true;
+			}
+		return true;
+	}
+	parking.VisualizeCircle(frame, img_mask, 3);
+
+	int64 t2 = getTickCount();
+	double ms = (t2 - t1) * 1000 / getTickFrequency();
+	sum += ms;
+	avg = sum / (double)frame_count;
+	//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
+	waitKey(3);
+	//ROS_INFO("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].   steer angle : %5.2f [deg]\n", ms, avg, 1000 / avg , angle);
+
+	return false;
+}
 
 
 void CrosswalkStopNode::parseRawimg(const sensor_msgs::ImageConstPtr& ros_img, cv::Mat& cv_img)
