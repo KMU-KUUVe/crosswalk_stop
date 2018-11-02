@@ -13,7 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
 	cv_bridge
 	OpenCV REQUIRED
 	roscpp
-    std_msgs
+  std_msgs
+	ackermann_msgs
 	sensor_msgs
 	image_transport
 )

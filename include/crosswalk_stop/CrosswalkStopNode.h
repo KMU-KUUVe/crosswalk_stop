@@ -97,7 +97,7 @@ class CrosswalkStopNode
 		int j = 0;
 		double angle = 0;
 		bool parking_stop = false;
-  	int throttle_ = 5;
+  	int throttle_ = 3;
   	int steer_control_value_= 0;
   	double angle_factor_ = 1.0;
 		cv::String test_video_path = "";

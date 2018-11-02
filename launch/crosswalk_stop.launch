@@ -13,11 +13,11 @@
     <!-- crosswalk_stop-->
 	<node pkg="crosswalk_stop" type="crosswalk_stop" name="crosswalk_stop">
 		<!-- scale platform -->
-		<param name="throttle" value="7" />
+		<param name="throttle" value="3" />
 		<param name="angle_factor" type="double" value="1.0" />
 		<remap from="/crosswalk_stop/ackermann" to="ackermann" />
 	</node>
 
     <!-- platform_control-->
-    <!--<node pkg="platform_control" type="write_serial" name="write_serial" />-->
+    <node pkg="platform_control" type="write_serial" name="write_serial" />
 </launch>
