@@ -86,9 +86,11 @@ int CrosswalkStopNode::laneDetecting()
 
 
 	lanedetector.filter_colors(img_denoise, img_mask2);
+
+	/*
 	//indoor test
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
-
+*/
 	// Ȯ�� ����
 	//Mat mask = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1));
 	//dilate(img_mask2, img_mask2, mask, Point(-1, -1), 3);
@@ -171,8 +173,10 @@ bool CrosswalkStopNode::parkingstart()
 	resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
 	img_denoise = parking.deNoise(frame);
 	parking.filter_colors(img_denoise, img_mask2);
+/*
 	//indoor test
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
+*/
 	img_mask = parking.mask(img_mask2);
 	imshow("original", frame);
 	imshow("color_filter", img_mask2);
