@@ -46,7 +46,6 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 	}
 	cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
-
 	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
 
 	control_pub_.publish(control_msg);
@@ -91,48 +90,33 @@ int CrosswalkStopNode::laneDetecting()
 	//indoor test
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
 */
-	// Ȯ�� ����
 	//Mat mask = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1));
 	//dilate(img_mask2, img_mask2, mask, Point(-1, -1), 3);
-
-	// �󺧸�
-	// lanedetector.DrawLabelingImage(img_mask2);
 
 	imshow("img_mask2", img_mask2);
 	img_edges = lanedetector.edgeDetector(img_mask2);
 
-
-
 	// Mask the image so that we only get the ROI
 	img_mask = lanedetector.mask(img_edges,Mask_method);
-
-
-
 	imshow("img_mask", img_mask);
 
 	// Obtain Hough lines in the cropped image
 	lines = lanedetector.houghLines(img_mask);
 
-
 	// Separate lines into left and right lines
 	left_right_lines = lanedetector.lineSeparation(lines, img_mask);
 
 	/*
-	// Ȯ��
 	for (j = 0; j < left_right_lines[0].size(); j++)
 	{
 	circle(frame, Point(left_right_lines[0][j][0], left_right_lines[0][j][1]), 5, Scalar(255, 0, 0), 5);
 	circle(frame, Point(left_right_lines[0][j][2], left_right_lines[0][j][3]), 5, Scalar(0, 0, 255), 5);
-
-
 	}
 
 	for (j = 0; j < left_right_lines[1].size(); j++)
 	{
-
 	circle(frame, Point(left_right_lines[1][j][0], left_right_lines[1][j][1]), 5, Scalar(0, 255, 0), 5);
 	circle(frame, Point(left_right_lines[1][j][2], left_right_lines[1][j][3]), 5, Scalar(0, 255, 0), 5);
-
 	}
 	 */
 
@@ -247,70 +231,17 @@ bool CrosswalkStopNode::run_test()
 		int64 t1 = getTickCount();
 		frame_count++;
 
-		// ȭ�� ũ�� ���� -> �ػ� �����Ͽ� ���ӵ� ���
-		resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
-
-		img_denoise = lanedetector.deNoise(frame);
-
-
-		lanedetector.filter_colors(img_denoise, img_mask2);
-
-		// Ȯ�� ����
-		//Mat mask = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1));
-		//dilate(img_mask2, img_mask2, mask, Point(-1, -1), 3);
-
-		// �󺧸�
-		// lanedetector.DrawLabelingImage(img_mask2);
-
-		imshow("img_mask2", img_mask2);
-		img_edges = lanedetector.edgeDetector(img_mask2);
-
-
-
-		// Mask the image so that we only get the ROI
-		img_mask = lanedetector.mask(img_edges,Mask_method);
-
-
-
-		imshow("img_mask", img_mask);
-
-		// Obtain Hough lines in the cropped image
-		lines = lanedetector.houghLines(img_mask);
-
-
-		// Separate lines into left and right lines
-		left_right_lines = lanedetector.lineSeparation(lines, img_mask);
-
-		/*
-		// Ȯ��
-		for (j = 0; j < left_right_lines[0].size(); j++)
-		{
-		circle(frame, Point(left_right_lines[0][j][0], left_right_lines[0][j][1]), 5, Scalar(255, 0, 0), 5);
-		circle(frame, Point(left_right_lines[0][j][2], left_right_lines[0][j][3]), 5, Scalar(0, 0, 255), 5);
-
-
+		bool x = parkingstart();
+		cout << "x : " << x << endl;
+		if(!parkingstart()){
+				cout << "do lane detecting" << endl;
+				steer_control_value_ = laneDetecting();
 		}
-
-		for (j = 0; j < left_right_lines[1].size(); j++)
-		{
-
-		circle(frame, Point(left_right_lines[1][j][0], left_right_lines[1][j][1]), 5, Scalar(0, 255, 0), 5);
-		circle(frame, Point(left_right_lines[1][j][2], left_right_lines[1][j][3]), 5, Scalar(0, 255, 0), 5);
-
+		else{
+			cout << "parking" << endl;
+			steer_control_value_ = 0;
 		}
-		 */
-
-
-		line(frame, Point(10, 0), Point(10, 20), Scalar(0, 0, 255), 5);
-
-		// Apply regression to obtain only one line for each side of the lane
-		lane = lanedetector.regression(left_right_lines, frame, angle);  // frame -> img_mask
-
-		// Predict the turn by determining the vanishing point of the the lines
-		turn = lanedetector.predictTurn();
-
-		// Plot lane detection
-		flag_plot = lanedetector.plotLane(frame, lane, turn);
+		cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 
 
