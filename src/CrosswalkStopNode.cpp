@@ -32,6 +32,11 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		cerr << e.what() << endl;
 	}
 
+	crosswalk_start();
+	steer_control_value_ = 0;
+
+
+/* ////////////////original code////////////////////
 	//getRosParamForUpdate();
 	//cout << "crosswalk_stop_node" << endl;
 	bool x = parkingstart();
@@ -44,6 +49,7 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		cout << "parking" << endl;
 		steer_control_value_ = 0;
 	}
+	//////////////////////////////////////////////// */
 	cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
@@ -55,7 +61,6 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 void CrosswalkStopNode::getRosParamForUpdate()
 {
 	nh_.getParam("throttle", throttle_);
-	nh_.getParam("angle_factor", angle_factor_);
 }
 
 
@@ -69,83 +74,7 @@ ackermann_msgs::AckermannDriveStamped CrosswalkStopNode::makeControlMsg()
 }
 
 
-int CrosswalkStopNode::laneDetecting()
-{
-	int ncols = frame.cols;
-	int nrows = frame.rows;
-
-
-	int64 t1 = getTickCount();
-	frame_count++;
-
-	// ȭ�� ũ�� ���� -> �ػ� �����Ͽ� ���ӵ� ���
-	resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
-
-	img_denoise = lanedetector.deNoise(frame);
-
-
-	lanedetector.filter_colors(img_denoise, img_mask2);
-
-	/*
-	//indoor test
-	bitwise_not(img_mask2,img_mask2); // test for black white invert
-*/
-	//Mat mask = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1));
-	//dilate(img_mask2, img_mask2, mask, Point(-1, -1), 3);
-
-	imshow("img_mask2", img_mask2);
-	img_edges = lanedetector.edgeDetector(img_mask2);
-
-	// Mask the image so that we only get the ROI
-	img_mask = lanedetector.mask(img_edges,Mask_method);
-	imshow("img_mask", img_mask);
-
-	// Obtain Hough lines in the cropped image
-	lines = lanedetector.houghLines(img_mask);
-
-	// Separate lines into left and right lines
-	left_right_lines = lanedetector.lineSeparation(lines, img_mask);
-
-	/*
-	for (j = 0; j < left_right_lines[0].size(); j++)
-	{
-	circle(frame, Point(left_right_lines[0][j][0], left_right_lines[0][j][1]), 5, Scalar(255, 0, 0), 5);
-	circle(frame, Point(left_right_lines[0][j][2], left_right_lines[0][j][3]), 5, Scalar(0, 0, 255), 5);
-	}
-
-	for (j = 0; j < left_right_lines[1].size(); j++)
-	{
-	circle(frame, Point(left_right_lines[1][j][0], left_right_lines[1][j][1]), 5, Scalar(0, 255, 0), 5);
-	circle(frame, Point(left_right_lines[1][j][2], left_right_lines[1][j][3]), 5, Scalar(0, 255, 0), 5);
-	}
-	 */
-
-
-	line(frame, Point(10, 0), Point(10, 20), Scalar(0, 0, 255), 5);
-
-	// Apply regression to obtain only one line for each side of the lane
-	lane = lanedetector.regression(left_right_lines, frame, angle);  // frame -> img_mask
-
-	// Predict the turn by determining the vanishing point of the the lines
-	turn = lanedetector.predictTurn();
-
-	// Plot lane detection
-	flag_plot = lanedetector.plotLane(frame, lane, turn);
-
-
-
-	int64 t2 = getTickCount();
-	double ms = (t2 - t1) * 1000 / getTickFrequency();
-	sum += ms;
-	avg = sum / (double)frame_count;
-	//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
-	waitKey(3);
-	ROS_INFO("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].   steer angle : %5.2f [deg]\n", ms, avg, 1000 / avg , angle);
-
-	return angle * angle_factor_;
-}
-
-bool CrosswalkStopNode::parkingstart()
+bool CrosswalkStopNode::crosswalk_start()
 {
 	int throttle;
 	int ncols = frame.cols;
@@ -156,25 +85,25 @@ bool CrosswalkStopNode::parkingstart()
 
 	resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
 	img_denoise = lanedetector.deNoise(frame);
-	lanedetector.filter_colors(img_denoise, img_mask2);
+	lanedetector.filter_colors(img_denoise, img_filtered);
 /*
 	//indoor test
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
 */
-	img_mask = parking.mask(img_mask2);
+	img_mask = crosswalk_stop.mask(img_filtered);
 	imshow("original", frame);
-	imshow("color_filter", img_mask2);
+	imshow("color_filter", img_filtered);
 	imshow("img_filter", img_mask);
 
-	cout << "parking start" << endl;
-	if(parking.detectstoppoint(img_mask, frame, 1, 3)){
+	cout << "crosswalk detect start" << endl;
+	if(crosswalk_stop.detectstoppoint(img_mask, frame, 1, 2)){
 		throttle_ = 0;
-		if(!parking_stop){
-				parking_stop = true;
+		if(!cwross_stop){
+				cwross_stop = true;
 			}
 		return true;
 	}
-	parking.VisualizeCircle(frame, img_mask, 3);
+	crosswalk_stop.VisualizeCircle(frame, img_mask, 2);
 
 	int64 t2 = getTickCount();
 	double ms = (t2 - t1) * 1000 / getTickFrequency();
@@ -182,7 +111,7 @@ bool CrosswalkStopNode::parkingstart()
 	avg = sum / (double)frame_count;
 	//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
 	waitKey(3);
-	//ROS_INFO("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].   steer angle : %5.2f [deg]\n", ms, avg, 1000 / avg , angle);
+	ROS_INFO("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].  \n", ms, avg, 1000 / avg );
 
 	return false;
 }
@@ -231,28 +160,29 @@ bool CrosswalkStopNode::run_test()
 		int64 t1 = getTickCount();
 		frame_count++;
 
-		bool x = parkingstart();
-		cout << "x : " << x << endl;
-		if(!parkingstart()){
-				cout << "do lane detecting" << endl;
-				steer_control_value_ = laneDetecting();
-		}
-		else{
-			cout << "parking" << endl;
+			crosswalk_start();
 			steer_control_value_ = 0;
-		}
-		cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 
+		/* ////////////////original code////////////////////
+			//getRosParamForUpdate();
+			//cout << "crosswalk_stop_node" << endl;
+			bool x = parkingstart();
+			cout << "x : " << x << endl;
+			if(!parkingstart()){
+					cout << "do lane detecting" << endl;
+					steer_control_value_ = laneDetecting();
+			}
+			else{
+				cout << "parking" << endl;
+				steer_control_value_ = 0;
+			}
+			////////////////////////////////////////////////*/
+			cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
-		int64 t2 = getTickCount();
-		double ms = (t2 - t1) * 1000 / getTickFrequency();
-		sum += ms;
-		avg = sum / (double)frame_count;
 		waitKey(25);
 		//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
 
-		printf("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].   steer angle : %5.2f [deg]\n", ms, avg, 1000 / avg , angle);
 	}
 
 }

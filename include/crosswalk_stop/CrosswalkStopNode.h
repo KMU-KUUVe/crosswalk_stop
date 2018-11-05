@@ -5,7 +5,7 @@
 #include <vector>
 #include "opencv2/opencv.hpp"
 #include "lane_detector/LaneDetector.h"
-#include "parking/Parking.h"
+#include "crosswalk_stop/CrosswalkStop.h"
 #include <std_msgs/String.h>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
@@ -17,7 +17,6 @@
 #define CrosswalkStopNode_H
 
 #define resize_n 1 // variable for image(frame) resize
-#define steer_height 30
 #define Mask_method 0 // method 0 :
 // method 1 :
 
@@ -66,8 +65,7 @@ class CrosswalkStopNode
 		 * @brief lane detecting wrapper
 		 *
 		 */
-		int laneDetecting();
-		bool parkingstart();
+		bool crosswalk_start();
 
 
 	protected:
@@ -76,30 +74,20 @@ class CrosswalkStopNode
 		ros::Subscriber image_sub_;		// 가공되지 않은 raw image 메시지를 Subscribe하는 Subscriber
 
 		LaneDetector lanedetector;  // Create the class object
-		Parking parking;
+		CrosswalkStop crosswalk_stop;
 
 		cv::Mat frame;
 		cv::Mat img_denoise;
-		cv::Mat img_edges;
 		cv::Mat img_mask;
-		cv::Mat img_lines;
-		cv::Mat img_mask2;
-		cv::Mat img_mask3;
-		std::vector<cv::Vec4i> lines;
-		std::vector<std::vector<cv::Vec4i> > left_right_lines;
-		std::vector<cv::Point> lane;
-		std::string turn;
-		int flag_plot = -1;
-		int i = 0;
+		cv::Mat img_filtered;
+
 		double avg = 0;
 		double sum = 0;
 		int frame_count = 0;
-		int j = 0;
-		double angle = 0;
-		bool parking_stop = false;
+
+		bool cwross_stop = false;
   	int throttle_ = 3;
   	int steer_control_value_= 0;
-  	double angle_factor_ = 1.0;
 		cv::String test_video_path = "";
 };
 

@@ -31,7 +31,6 @@ include_directories(
 
 include_directories(
 	${lane_detector_SOURCE_DIR}/include
-	${parking_SOURCE_DIR}/include
 )
 
 ## System dependencies are found with CMake's conventions
@@ -153,7 +152,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(crosswalk_stop src/main.cpp src/CrosswalkStopNode.cpp ${lane_detector_SOURCE_DIR}/src/LaneDetector.cpp ${parking_SOURCE_DIR}/src/Parking.cpp)
+add_executable(crosswalk_stop src/main.cpp src/CrosswalkStopNode.cpp src/CrosswalkStop.cpp ${lane_detector_SOURCE_DIR}/src/LaneDetector.cpp )
 add_dependencies(crosswalk_stop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(crosswalk_stop
   ${catkin_LIBRARIES}
