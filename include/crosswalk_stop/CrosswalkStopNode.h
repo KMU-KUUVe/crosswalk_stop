@@ -73,6 +73,8 @@ class CrosswalkStopNode
 		ros::Publisher control_pub_;	// Controll 메시지를 Publish하는 Publisher
 		ros::Subscriber image_sub_;		// 가공되지 않은 raw image 메시지를 Subscribe하는 Subscriber
 
+		bool mission_cleared = false;
+		bool mission_start = false;
 		LaneDetector lanedetector;  // Create the class object
 		CrosswalkStop crosswalk_stop;
 

@@ -4,8 +4,10 @@ using namespace std;
 using namespace cv;
 
 CrosswalkStopNode::CrosswalkStopNode()
+	:as_(nh_,"crosswalk_stop", boost::bind(&CrosswalkStopNode::actionCallback, this, _1), false)
 {
 	nh_ = ros::NodeHandle("~");
+	as_.start();
 
 	/* if NodeHangle("~"), then (write -> /lane_detector/write)	*/
 	control_pub_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann", 10);
@@ -21,9 +23,27 @@ CrosswalkStopNode::CrosswalkStopNode(String path)
 {}
 
 
+void CrosswalkStopNode::actionCallback(const crosswalk_stop::U_TurnGoalConstPtr& goal)
+{
+	cout <<"crosswalk_stop actionCallback called" << endl;
+	mission_start = true;
+
+	ros::Rate r(10);
+
+	while(ros::ok()) {
+		if(mission_cleared_) {
+			crosswalk_stop::UTurnResult result;
+			as_.setSucceeded(result);
+			mission_start_ = false;
+			break;
+		}
+		r.sleep();	// sleep 0.1 sec
+	}
+}
 void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 {
-
+	if(mission_start)
+	{
 	try{
 		parseRawimg(image, frame);
 	} catch(const cv_bridge::Exception& e) {
@@ -56,7 +76,7 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
 
 	control_pub_.publish(control_msg);
-	
+	}
 }
 
 
