@@ -23,7 +23,7 @@ CrosswalkStopNode::CrosswalkStopNode(String path)
 {}
 
 
-void CrosswalkStopNode::actionCallback(const crosswalk_stop::U_TurnGoalConstPtr& goal)
+void CrosswalkStopNode::actionCallback(const crosswalk_stop::u_turnGoalConstPtr& goal)
 {
 	cout <<"crosswalk_stop actionCallback called" << endl;
 	mission_start = true;
@@ -32,7 +32,7 @@ void CrosswalkStopNode::actionCallback(const crosswalk_stop::U_TurnGoalConstPtr&
 
 	while(ros::ok()) {
 		if(mission_cleared_) {
-			crosswalk_stop::UTurnResult result;
+			crosswalk_stop::u_turnResult result;
 			as_.setSucceeded(result);
 			mission_start_ = false;
 			break;
