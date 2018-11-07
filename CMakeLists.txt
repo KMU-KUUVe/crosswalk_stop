@@ -17,8 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
 	ackermann_msgs
 	sensor_msgs
 	image_transport
-	actionlib_msgs
-	actionlib
+#	actionlib_msgs
+#	actionlib
 )
 
 #find_package(OpenCV 3 REQUIRED)
@@ -83,10 +83,10 @@ include_directories(
 # )
 
 ## Generate actions in the 'action' folder
-add_action_files(
-    DIRECTORY action
-    FILES crosswalk.action
-)
+#add_action_files(
+#    DIRECTORY action
+#    FILES crosswalk.action
+#)
 
 ## Generate added messages and services with any dependencies listed here
 #generate_messages(
@@ -125,7 +125,7 @@ add_action_files(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES opencv_test
-  CATKIN_DEPENDS roscpp std_msgs sensor_msgs actionlib_msgs
+  CATKIN_DEPENDS roscpp std_msgs sensor_msgs #actionlib_msgs
   DEPENDS system_lib
 )
 

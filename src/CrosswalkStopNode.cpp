@@ -86,8 +86,8 @@ bool CrosswalkStopNode::crosswalk_start()
 	frame_count++;
 
 	resize(frame, frame, Size(ncols / resize_n, nrows / resize_n));
-	img_denoise = lanedetector.deNoise(frame);
-	lanedetector.filter_colors(img_denoise, img_filtered);
+	lanedetector.filter_colors(frame, img_filtered);
+	img_denoise = lanedetector.deNoise(img_filtered);
 /*
 	//indoor test
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
