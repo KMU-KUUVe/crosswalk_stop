@@ -70,7 +70,7 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		cout << "parking" << endl;
 		steer_control_value_ = 0;
 	}
-	//////////////////////////////////////////////// */
+//////////////////////////////////////////////// */
 	cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
@@ -199,7 +199,7 @@ bool CrosswalkStopNode::run_test()
 				cout << "parking" << endl;
 				steer_control_value_ = 0;
 			}
-			////////////////////////////////////////////////*/
+		//////////////////////////////////////////////// */
 			cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
 
 		waitKey(25);
