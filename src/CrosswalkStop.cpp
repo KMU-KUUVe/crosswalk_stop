@@ -57,7 +57,7 @@ bool CrosswalkStop::stop_detect(cv::Mat img_filtered, int detect_layer)
 	for(int j = detect_layer-1; j >= 0; j--){
 		for(int i = 0; i < PIXCEL_N; i++){
 			//cout << chk_img.at<uchar>(chk_img.rows * (int)ROW_LOCATE/100 - j*10  , chk_img.cols * (int)COL_LOCATE / 100 - PIXCEL_N/2 + i) << endl;
-			if(chk_img.at<uchar>(chk_img.rows * (int)ROW_LOCATE/100 - j*10  , chk_img.cols * (int)COL_LOCATE / 100 + i) < STOP_THRES){
+			if(chk_img.at<uchar>(chk_img.rows * (int)ROW_LOCATE/100 - j*10  , (chk_img.cols * (int)COL_LOCATE / 100) + i) < STOP_THRES){
 				return false;
 			}
 		}
@@ -77,7 +77,7 @@ void CrosswalkStop::VisualizeCircle(cv::Mat _img_bgr, cv::Mat _img_filtered, int
 		for(int i = 0; i < PIXCEL_N; i++){
 			//cout << chk_img.at<uchar>(chk_img.rows * (int)ROW_LOCATE/100 - j*10  , chk_img.cols * (int)COL_LOCATE / 100 - PIXCEL_N/2 + i) << endl;
 			//circle(img_bgr, Point(chk_img.rows * (int)ROW_LOCATE/100 - j*10  , chk_img.cols * (int)COL_LOCATE / 100 + i), 5, Scalar(255, 0, 255 * c_stop), -1);
-      circle(img_filtered, Point(img_filtered.rows * (int)ROW_LOCATE/100 - j*10  , img_filtered.cols * (int)COL_LOCATE / 100 + i), 5, Scalar(255, 0, 255 * c_stop), -1);
+      circle(img_filtered, Point(img_filtered.cols * (int)COL_LOCATE / 100 + i, img_filtered.rows * (int)ROW_LOCATE/100 - j*10), 2, Scalar(255, 0, 255 * c_stop), -1);
 		}
 	}
 	//cout << "visualize" << endl;
