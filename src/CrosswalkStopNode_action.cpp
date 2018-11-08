@@ -18,12 +18,7 @@ CrosswalkStopNode::CrosswalkStopNode()
 }
 
 
-CrosswalkStopNode::CrosswalkStopNode(String path)
-	: test_video_path(path)
-{}
-
-
-void CrosswalkStopNode::actionCallback(const crosswalk_stop::u_turnGoalConstPtr& goal)
+void CrosswalkStopNode::actionCallback(const u_turn::u_turnGoalConstPtr& goal)
 {
 	cout <<"crosswalk_stop actionCallback called" << endl;
 	mission_start = true;
@@ -31,10 +26,10 @@ void CrosswalkStopNode::actionCallback(const crosswalk_stop::u_turnGoalConstPtr&
 	ros::Rate r(10);
 
 	while(ros::ok()) {
-		if(mission_cleared_) {
-			crosswalk_stop::u_turnResult result;
+		if(mission_cleared) {
+			u_turn::u_turnResult result;
 			as_.setSucceeded(result);
-			mission_start_ = false;
+			mission_start = false;
 			break;
 		}
 		r.sleep();	// sleep 0.1 sec

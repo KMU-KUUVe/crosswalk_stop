@@ -17,8 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
 	ackermann_msgs
 	sensor_msgs
 	image_transport
-#	actionlib_msgs
-#	actionlib
+	actionlib_msgs
+	actionlib
 )
 
 #find_package(OpenCV 3 REQUIRED)
@@ -83,15 +83,15 @@ include_directories(
 # )
 
 ## Generate actions in the 'action' folder
-#add_action_files(
-#    DIRECTORY action
-#    FILES crosswalk.action
-#)
+add_action_files(
+    DIRECTORY action
+    FILES u_turn.action
+)
 
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#   DEPENDENCIES std_msgs  actionlib_msgs # Or other packages containing msgs
-#)
+generate_messages(
+   DEPENDENCIES std_msgs  actionlib_msgs # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -152,7 +152,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(crosswalk_stop src/main.cpp src/CrosswalkStopNode.cpp src/CrosswalkStop.cpp ${lane_detector_SOURCE_DIR}/src/LaneDetector.cpp )
+add_executable(crosswalk_stop src/main.cpp src/CrosswalkStopNode_action.cpp src/CrosswalkStop.cpp ${lane_detector_SOURCE_DIR}/src/LaneDetector.cpp )
 add_dependencies(crosswalk_stop ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(crosswalk_stop
   ${catkin_LIBRARIES}

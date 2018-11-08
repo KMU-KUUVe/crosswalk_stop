@@ -12,6 +12,8 @@
 #include <sensor_msgs/image_encodings.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
 #include <signal.h>
+#include <actionlib/server/simple_action_server.h>
+#include <u_turn/u_turnAction.h>
 
 #ifndef CrosswalkStopNode_H
 #define CrosswalkStopNode_H
@@ -25,8 +27,6 @@ class CrosswalkStopNode
 	public:
 		CrosswalkStopNode();
 
-		CrosswalkStopNode(cv::String path);
-
 		/**
 		 * Run test that use video file.
 		 */
@@ -39,9 +39,11 @@ class CrosswalkStopNode
 		 *
 		 */
 		void imageCallback(const sensor_msgs::ImageConstPtr& image);
+		void actionCallback(const u_turn::u_turnGoalConstPtr& goal);
 
 
 	protected:
+		
 		/**
 		 * @brief 차선 인식과 관련된 파라미터 중 동적으로 바뀔 수 있는 값들을 읽어오는 함수
 		 *
@@ -72,6 +74,7 @@ class CrosswalkStopNode
 		ros::NodeHandle nh_;
 		ros::Publisher control_pub_;	// Controll 메시지를 Publish하는 Publisher
 		ros::Subscriber image_sub_;		// 가공되지 않은 raw image 메시지를 Subscribe하는 Subscriber
+		actionlib::SimpleActionServer<u_turn::u_turnAction> as_;
 
 		bool mission_cleared = false;
 		bool mission_start = false;
