@@ -10,11 +10,10 @@ CrosswalkStopNode::CrosswalkStopNode()
 	as_.start();
 
 	/* if NodeHangle("~"), then (write -> /lane_detector/write)	*/
-	control_pub_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann", 10);
+//	control_pub_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann", 10);
 
 	image_sub_ = nh_.subscribe("/usb_cam/image_raw", 1, &CrosswalkStopNode::imageCallback, this);
 
-	getRosParamForUpdate();
 }
 
 
@@ -49,7 +48,7 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 	}
 
 	crosswalk_start();
-	steer_control_value_ = 0;
+	//steer_control_value = 0;
 
 
 /* ////////////////original code////////////////////
@@ -66,11 +65,10 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		steer_control_value_ = 0;
 	}
 //////////////////////////////////////////////// */
-	cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
+	cout << "throttle : " << throttle << endl;
 
-	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
-
-	control_pub_.publish(control_msg);
+//	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
+//	control_pub_.publish(control_msg);
 	}
 }
 
@@ -114,7 +112,7 @@ bool CrosswalkStopNode::crosswalk_start()
 
 	cout << "crosswalk detect start" << endl;
 	if(crosswalk_stop.detectstoppoint(img_mask, frame, 1, 2)){
-		throttle_ = 0;
+		throttle = 0;
 		if(!cwross_stop){
 				cwross_stop = true;
 			}
@@ -143,63 +141,4 @@ void CrosswalkStopNode::parseRawimg(const sensor_msgs::ImageConstPtr& ros_img, c
 	if (cv_img.empty()) {
 		throw std::runtime_error("frame is empty!");
 	}
-}
-
-
-bool CrosswalkStopNode::run_test()
-{
-	if(test_video_path.empty())
-	{
-		ROS_ERROR("Test is failed. video path is empty! you should set video path by constructor argument");
-		return false;
-	}
-
-	VideoCapture cap;
-	//cap.open("../../kasa.mp4");
-	cap.open(test_video_path);
-
-	if (!cap.isOpened())
-	{
-		ROS_ERROR("Test is failed. video is empty! you should check video path (constructor argument is correct)");
-		return false;
-	}
-
-	while (1) {
-		// Capture frame
-		if (!cap.read(frame))
-			break;
-
-
-		int ncols = frame.cols;
-		int nrows = frame.rows;
-
-
-		int64 t1 = getTickCount();
-		frame_count++;
-
-			crosswalk_start();
-			steer_control_value_ = 0;
-
-
-		/* ////////////////original code////////////////////
-			//getRosParamForUpdate();
-			//cout << "crosswalk_stop_node" << endl;
-			bool x = parkingstart();
-			cout << "x : " << x << endl;
-			if(!parkingstart()){
-					cout << "do lane detecting" << endl;
-					steer_control_value_ = laneDetecting();
-			}
-			else{
-				cout << "parking" << endl;
-				steer_control_value_ = 0;
-			}
-		//////////////////////////////////////////////// */
-			cout << "throttle : " << throttle_ << "steer : " << steer_control_value_ << endl;
-
-		waitKey(25);
-		//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
-
-	}
-
 }
