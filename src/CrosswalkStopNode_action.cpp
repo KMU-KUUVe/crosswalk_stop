@@ -8,11 +8,6 @@ CrosswalkStopNode::CrosswalkStopNode()
 {
 	nh_ = ros::NodeHandle("~");
 	as_.start();
-
-	/* if NodeHangle("~"), then (write -> /lane_detector/write)	*/
-//	control_pub_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann", 10);
-
-
 }
 
 
@@ -48,8 +43,6 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 	}
 
 	crosswalk_start();
-	//steer_control_value = 0;
-
 
 /* ////////////////original code////////////////////
 	//getRosParamForUpdate();
@@ -65,29 +58,14 @@ void CrosswalkStopNode::imageCallback(const sensor_msgs::ImageConstPtr& image)
 		steer_control_value_ = 0;
 	}
 //////////////////////////////////////////////// */
-	cout << "throttle : " << throttle << endl;
 
-//	ackermann_msgs::AckermannDriveStamped control_msg = makeControlMsg();
-//	control_pub_.publish(control_msg);
 	}
 }
 
 
 void CrosswalkStopNode::getRosParamForUpdate()
 {
-	nh_.getParam("throttle", throttle_);
 }
-
-
-ackermann_msgs::AckermannDriveStamped CrosswalkStopNode::makeControlMsg()
-{
-	ackermann_msgs::AckermannDriveStamped control_msg;
-	//control_msg.drive.steering_angle = steer_control_value;
-	control_msg.drive.steering_angle = steer_control_value_;
-	control_msg.drive.speed = throttle_;
-	return control_msg;
-}
-
 
 bool CrosswalkStopNode::crosswalk_start()
 {
@@ -124,9 +102,7 @@ bool CrosswalkStopNode::crosswalk_start()
 	double ms = (t2 - t1) * 1000 / getTickFrequency();
 	sum += ms;
 	avg = sum / (double)frame_count;
-	//cout << "it took :  " << ms << "ms." << "average_time : " << avg << " frame per second (fps) : " << 1000 / avg << endl;
 	waitKey(3);
-	ROS_INFO("it took : %6.2f [ms].  average_time : %6.2f [ms].  frame per second (fps) : %6.2f [frame/s].  \n", ms, avg, 1000 / avg );
 
 	return false;
 }

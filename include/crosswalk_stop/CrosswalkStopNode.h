@@ -27,46 +27,13 @@ class CrosswalkStopNode
 	public:
 		CrosswalkStopNode();
 
-		/**
-		 * Run test that use video file.
-		 */
-		bool run_test();
-
-		/**
-		 * @brief 카메라로부터 들어온 이미지를 Subscribe 했을 때 호출되는 Callback 함수
-		 *
-		 * @param image 카메라 드라이버 노드에서 보낸 이미지를 받아 포인팅하고있는 포인터
-		 *
-		 */
 		void imageCallback(const sensor_msgs::ImageConstPtr& image);
 		void actionCallback(const u_turn::u_turnGoalConstPtr& goal);
 
-
 	protected:
 		
-		/**
-		 * @brief 차선 인식과 관련된 파라미터 중 동적으로 바뀔 수 있는 값들을 읽어오는 함수
-		 *
-		 * @details 이 함수는 주기적으로 계속 호출되므로, rosparam을 통해 노드 실행중 동적으로 값들을 바꾸면서 테스트가 가능하다.
-		 */
 		void getRosParamForUpdate();
-
-		/**
-		 * @brief Ros 통신에서 사용하는 이미지 타입을 Opencv의 Mat 타입으로 변환해주는 함수
-		 *
-		 */
 		void parseRawimg(const sensor_msgs::ImageConstPtr& ros_img, cv::Mat& cv_img);
-
-		/**
-		 * @brief make control message
-		 *
-		 */
-		ackermann_msgs::AckermannDriveStamped makeControlMsg();
-
-		/**
-		 * @brief lane detecting wrapper
-		 *
-		 */
 		bool crosswalk_start();
 
 
@@ -91,8 +58,8 @@ class CrosswalkStopNode
 		int frame_count = 0;
 
 		bool cwross_stop = false;
-  	int throttle_ = 3;
-  	int steer_control_value_= 0;
+		int throttle_ = 3;
+		int steer_control_value_= 0;
 		cv::String test_video_path = "";
 };
 
