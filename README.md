@@ -1,4 +1,4 @@
-# 2018 lane detector using opencv only
+# 2018 crosswalk detector using opencv only
 
 ## branches
 * master: KASA competition lane detector (continuous lane)
