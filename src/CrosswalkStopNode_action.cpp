@@ -12,7 +12,6 @@ CrosswalkStopNode::CrosswalkStopNode()
 	/* if NodeHangle("~"), then (write -> /lane_detector/write)	*/
 //	control_pub_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>("ackermann", 10);
 
-	image_sub_ = nh_.subscribe("/usb_cam/image_raw", 1, &CrosswalkStopNode::imageCallback, this);
 
 }
 
@@ -20,6 +19,7 @@ CrosswalkStopNode::CrosswalkStopNode()
 void CrosswalkStopNode::actionCallback(const u_turn::u_turnGoalConstPtr& goal)
 {
 	cout <<"crosswalk_stop actionCallback called" << endl;
+	image_sub_ = nh_.subscribe("/usb_cam/image_raw", 1, &CrosswalkStopNode::imageCallback, this);
 	mission_start = true;
 
 	ros::Rate r(10);
