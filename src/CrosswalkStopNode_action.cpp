@@ -21,9 +21,9 @@ void CrosswalkStopNode::actionCallback(const u_turn::u_turnGoalConstPtr& goal)
 
 	while(ros::ok()) {
 		if(mission_cleared) {
+			mission_start = false;
 			u_turn::u_turnResult result;
 			as_.setSucceeded(result);
-			mission_start = false;
 			break;
 		}
 		r.sleep();	// sleep 0.1 sec
@@ -84,15 +84,14 @@ bool CrosswalkStopNode::crosswalk_start()
 	bitwise_not(img_mask2,img_mask2); // test for black white invert
 */
 	img_mask = crosswalk_stop.mask(img_filtered);
-	imshow("original", frame);
-	imshow("color_filter", img_filtered);
-	imshow("img_filter", img_mask);
+	//imshow("original", frame);
+	//imshow("color_filter", img_filtered);
+	//imshow("img_filter", img_mask);
 
 	cout << "crosswalk detect start" << endl;
 	if(crosswalk_stop.detectstoppoint(img_mask, frame, 1, 2)){
-		throttle = 0;
-		if(!cwross_stop){
-				cwross_stop = true;
+		if(!mission_cleared){
+				mission_cleared = true;
 			}
 		return true;
 	}
