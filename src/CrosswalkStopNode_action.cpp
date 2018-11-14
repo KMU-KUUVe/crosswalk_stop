@@ -23,6 +23,7 @@ void CrosswalkStopNode::actionCallback(const u_turn::u_turnGoalConstPtr& goal)
 		if(mission_cleared) {
 			mission_start = false;
 			u_turn::u_turnResult result;
+			destroyAllWindows();
 			as_.setSucceeded(result);
 			break;
 		}
